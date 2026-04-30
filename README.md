@@ -23,7 +23,7 @@ During periodic defrost cycles, the return temperature drops because the buildin
 Instead, the controller should allow more time for a single compressor to heat the system. The 25 minute limit must increase.
 
 > Change HRM25 limit from 25 minutes (1500s / 0x05DC) to 115 minutes (6900s / 0x1AF4).
-> At offset 0x1179D8, change bytes 0xDC05 to 0xF41A
+> At offset 0x1179D8, change bytes 0xDC05 to 0xF41A:
 
     001179B0  38 79 1D 00 39 79 1D 00 3A 79 1D 00 3B 79 1D 00
     001179C0  3C 79 1D 00 30 1E 1E 00 28 79 1D 00 2C 79 1D 00
