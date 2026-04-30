@@ -5,7 +5,7 @@ This repository documents the patches to V4.81.2 of the Luxtronic Firmware that 
 
 The Luxtronic firmware is plagued by many bugs and this particular setup is no exception. Sadly, Alpha Innotec has long since stopped delivering improvements or fixes.
 
-### Fix 1: HC Add-time limit too short (de: HRM-Zeit)
+### Fix 1: 'HC Add-time' limit too short (de: HRM-Zeit)
 
 **Background**
 The _'HC Add-time'_ timer increases while the return temperature remains below the lower hysteresis threshold of its target value (de: Rücklauf-Soll). If this timer exceeds 25 minutes of heating operation, the second compressor is activated. However, operating both compressors would require a flow rate of 4'000 litres per hour. Since no domestical hydraulic installation can be expected to support this insane amount of flow, the excess flow is diverted through the parallel buffer tank. This prematurely raises the return temperature above the hysteresis threshold, leading to an early shutdown of the system. Because the building itself has not been sufficiently heated (i.e. it remains cold), the return temperature quickly drops below hysteresis again, triggering a new heating cycle after only a short pause.
