@@ -1,4 +1,4 @@
-# AIT Twin LWD 90
+# AIT Twin LWD 90 Fixes
 .: Binary fixes for Alpha Innotec Luxtronic heat pump controller firmware :.
 
 This repository documents the patches to V4.81.2 of the Luxtronic Firmware that runs on installations using two LWD90 compressors and the hydraulic module HMD2.
