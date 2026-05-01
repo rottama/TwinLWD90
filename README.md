@@ -102,11 +102,11 @@ Adjust the compressor heater target temperature calculcation of the Luxtronik co
 
 The _wp2reg-V4.81.2_ firmware file is a nested .tar.gz archive. Apply the binary patches to:
 
-> wp2reg-V4.81.2/home.wp2reg-V4.81.2/appl
+> wp2reg-V4.81.2/wp2reg-AlphaInnotech-prod/home.wp2reg-V4.81.2/appl
 
 Repackage carefully and update the MD5 hash of _home.wp2reg-V4.81.2_:
 
-> wp2reg-V4.81.2/home.wp2reg-V4.81.2.md5
+> wp2reg-V4.81.2/wp2reg-AlphaInnotech-prod/home.wp2reg-V4.81.2.md5
 
 I purposely omit specific commands because at this stage _you_ need to be 100% sure you handle these files correctly!
 
