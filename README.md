@@ -5,22 +5,7 @@ This repository documents the patches to V4.81.2 of the Luxtronic Firmware that 
 
 The Luxtronic firmware is plagued by many bugs and this particular setup is no exception. Sadly, Alpha Innotec has long since stopped delivering improvements or fixes.
 
-### Fix 1: 'HC Add-time' limit too short (de: HRM-Zeit)
-
-**Background**
-The _'HC Add-time'_ timer increases while the return temperature remains below the lower hysteresis threshold of its target value (de: Rücklauf-Soll). If this timer exceeds 25 minutes of heating operation, the second compressor is activated. However, operating both compressors would require a flow rate of 4'000 litres per hour. Since no domestical hydraulic installation can be expected to support this insane amount of flow, the excess flow is diverted through the parallel buffer tank. This prematurely raises the return temperature above the hysteresis threshold, leading to an early shutdown of the system. Because the building itself has not been sufficiently heated (i.e. it remains cold), the return temperature quickly drops below hysteresis again, triggering a new heating cycle after only a short pause.
-
-**Key issue 1:**
-The key issue is that before the heating turns on, the system ***almost always*** waits for the duration of 1 off-time switch cycle (Schaltspielsperre SSP) which is 20 minutes, even if the system has been idle for over an hour, likely due to a bug. Unfortunately, the _'HC Add-time'_ timer continues to run during this waiting period. As a result, it already reaches around 20 minutes by the time heating resumes, leaving only about 5 minutes to raise the floor heating temperature before the second compressor is engaged.
-
-As a result, the system is short-cycling on and off, which puts undue thermal stress on the components (multiple compressor starts instead of a single continuous run).
-
-**Key issue 2:**
-During periodic defrost cycles, the return temperature drops because the building supplies the energy required for this process. This however causes the _'HC Add-time'_ timer to accumulate several minutes during each defrost. During extended heating periods in winter, a single compressor may be sufficient to heat the building. However, after a few hours, the 25-minute limit is inevitably exceeded because the LWD90 performs a defrost cycle every 45–60 minutes. Engaging the second compressor interrupts this otherwise continuous run of the compressor and leads to short-cycling for the reasons described above.
-
-**Solution**
-
-Instead, the controller should allow more time for a single compressor to heat the system. The 25 minute limit must increase.
+## Fix: 'HC Add-time' limit too short (de: HRM-Zeit)
 
 > Change HRM25 limit from 25 minutes (1500s / 0x05DC) to 115 minutes (6900s / 0x1AF4).
 > At offset 0x1179D8, change bytes 0xDC05 to 0xF41A:
@@ -41,9 +26,85 @@ becomes
 
 Attention: In Luxtronik GUI, you must configure 'release 2hg' (de: Freig. ZWE) to 120 minutes!
 
+**Background**
+The _'HC Add-time'_ timer increases while the return temperature remains below the lower hysteresis threshold of its target value (de: Rücklauf-Soll). If this timer exceeds 25 minutes of heating operation, the second compressor is activated. However, operating both compressors would require a flow rate of 4'000 litres per hour. Since no domestical hydraulic installation can be expected to support this insane amount of flow, the excess flow is diverted through the parallel buffer tank. This prematurely raises the return temperature above the hysteresis threshold, leading to an early shutdown of the system. Because the building itself has not been sufficiently heated (i.e. it remains cold), the return temperature quickly drops below hysteresis again, triggering a new heating cycle after only a short pause.
+
+**Key issue 1:**
+The key issue is that before the heating turns on, the system ***almost always*** waits for the duration of 1 off-time switch cycle (Schaltspielsperre SSP) which is 20 minutes, even if the system has been idle for over an hour, likely due to a bug. Unfortunately, the _'HC Add-time'_ timer continues to run during this waiting period. As a result, it already reaches around 20 minutes by the time heating resumes, leaving only about 5 minutes to raise the floor heating temperature before the second compressor is engaged.
+
+As a result, the system is short-cycling on and off, which puts undue thermal stress on the components (multiple compressor starts instead of a single continuous run).
+
+**Key issue 2:**
+During periodic defrost cycles, the return temperature drops because the building supplies the energy required for this process. This however causes the _'HC Add-time'_ timer to accumulate several minutes during each defrost. During extended heating periods in winter, though a single compressor may be sufficient to heat the building, after a few hours, the 25-minute limit is inevitably exceeded because the LWD90 performs a defrost cycle every 45–60 minutes. Engaging the second compressor interrupts this otherwise continuous run of the compressor and leads to short-cycling for the reasons described above.
+
+**Solution**
+
+Instead, the controller should allow more time for a single compressor to heat the system. The 25 minute limit must increase.
+
+
 This fix significantly improves runtime behavior:
 
 ![](img/HRM25fix.jpg "beautiful")
+
+## Fix: Compressor-heating mismatch
+
+> 1. Change heating minimum from 35.0° (0x15E) to 33.0° (0x14A)
+> At offset 0x055228, change byte 0x5E to 0x4A
+>
+> 2. Change relative temperature offset from from 30.0° (0x12C) to 28.0° (0x118)
+> At offset 0x0551F4, change byte 0x4B to 0x46 (ARM 8-bit immediate enconding)
+
+    000551D0  14 D0 4D E2 10 00 0B E5 00 30 A0 E3 0C 30 0B E5
+    000551E0  40 30 9F E5 08 30 0B E5 10 30 1B E5 04 31 93 E5
+    000551F0  00 30 93 E5 4B 3F 83 E2 0C 30 0B E5 0C 20 1B E5
+    00055200  08 30 1B E5 03 00 52 E1 01 00 00 AA 08 30 1B E5
+    00055210  0C 30 0B E5 0C 30 1B E5 03 00 A0 E1 00 D0 8B E2
+    00055220  00 08 BD E8 1E FF 2F E1 5E 01 00 00 04 B0 2D E5
+    00055230  00 B0 8D E2 0C D0 4D E2 08 00 0B E5 08 30 1B E5
+    00055240  24 30 93 E5 31 00 53 E3 0F 00 00 0A 08 30 1B E5
+
+becomes:
+
+    000551D0  14 D0 4D E2 10 00 0B E5 00 30 A0 E3 0C 30 0B E5
+    000551E0  40 30 9F E5 08 30 0B E5 10 30 1B E5 04 31 93 E5
+    000551F0  00 30 93 E5 46 3F 83 E2 0C 30 0B E5 0C 20 1B E5
+    00055200  08 30 1B E5 03 00 52 E1 01 00 00 AA 08 30 1B E5
+    00055210  0C 30 0B E5 0C 30 1B E5 03 00 A0 E1 00 D0 8B E2
+    00055220  00 08 BD E8 1E FF 2F E1 4A 01 00 00 04 B0 2D E5
+    00055230  00 B0 8D E2 0C D0 4D E2 08 00 0B E5 08 30 1B E5
+    00055240  24 30 93 E5 31 00 53 E3 0F 00 00 0A 08 30 1B E5
+
+**Background**
+
+In V4.81.2, the idle compressor heating target is defined as:
+
+    target = [Condensing Temperature] + 30.0°C
+    if (target < 35.0°C)
+        target = 35.0°C
+
+The Luxtronic controller firmware checks the compressor heater temperature sensor and allows compressor operation only if the measured temperature is **above** this target.
+
+However the compressor heater itself is not controlled by the Luxtronic controller, but by the firmware in the LWD90 outdoor unit. This firmware applies a negative hysteresis of -1°C: it switches off the compressor heater once when target temperature is reached and only reactivates it when the temperature drops to -1°C **below** the target.
+
+In theory, this means the start condition could never be met.
+
+In practice, after the compressor heating phase ends, the measured temperature overshoots slightly due to thermal insulation around the compressor. This creates a brief window during which the Luxtronic controller considers the compressor ready and permits operation. Additionally, in a twin-compressor system, the likelihood increases that at least one compressor happens to be within the acceptable range. This effectively masks the underlying flaw in the control logic (as is the case with many other things in domestic heating).
+
+So there you have it: It is largely by coincidence that your Alpha Innotec heat pump is working at all.
+
+### How to patch
+
+The _wp2reg-V4.81.2_ firmware file is a nested .tar.gz archive. Apply the binary patches to:
+
+> wp2reg-V4.81.2/home.wp2reg-V4.81.2/appl
+
+Repackage carefully and update the MD5 hash of _home.wp2reg-V4.81.2_:
+
+> wp2reg-V4.81.2/home.wp2reg-V4.81.2.md5
+
+I purposely omit specific commands because at this stage _you_ need to be 100% sure you handle these files correctly!
+
+Tip: You can overwrite a character in the language file of your choice to mark a modified version of the firmware.
 
 ### Disclaimer
 
