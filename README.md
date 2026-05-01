@@ -24,7 +24,7 @@ becomes
     001179E0  20 1C 00 00 00 48 2D E9 04 B0 8D E2 58 30 9F E5
     001179F0  00 30 D3 E5 04 00 53 E3 01 00 00 1A 67 FF FF EB
 
-Attention: In Luxtronik GUI, you must configure 'release 2hg' (de: Freig. ZWE) to 120 minutes!
+**Attention:** In Luxtronik GUI, you must configure 'release 2hg' (de: Freig. ZWE) to 120 minutes!
 
 **Background**
 The _'HC Add-time'_ timer increases while the return temperature remains below the lower hysteresis threshold of its target value (de: Rücklauf-Soll). If this timer exceeds 25 minutes of heating operation, the second compressor is activated. However, operating both compressors would require a flow rate of 4'000 litres per hour. Since no domestical hydraulic installation can be expected to support this insane amount of flow, the excess flow is diverted through the parallel buffer tank. This prematurely raises the return temperature above the hysteresis threshold, leading to an early shutdown of the system. Because the building itself has not been sufficiently heated (i.e. it remains cold), the return temperature quickly drops below hysteresis again, triggering a new heating cycle after only a short pause.
@@ -48,10 +48,10 @@ This fix significantly improves runtime behavior:
 
 ## Fix: Compressor-heating mismatch
 
-> 1. Change heating minimum from 35.0° (0x15E) to 33.0° (0x14A)
+> 1. Change compressor heater minimum temperature from 35.0° (0x15E) to 33.0° (0x14A)
 > At offset 0x055228, change byte 0x5E to 0x4A
 >
-> 2. Change relative temperature offset from from 30.0° (0x12C) to 28.0° (0x118)
+> 2. Change target temperature offset from from 30.0° (0x12C) to 28.0° (0x118)
 > At offset 0x0551F4, change byte 0x4B to 0x46 (ARM 8-bit immediate enconding)
 
     000551D0  14 D0 4D E2 10 00 0B E5 00 30 A0 E3 0C 30 0B E5
@@ -91,6 +91,12 @@ In theory, this means the start condition could never be met.
 In practice, after the compressor heating phase ends, the measured temperature overshoots slightly due to thermal insulation around the compressor. This creates a brief window during which the Luxtronic controller considers the compressor ready and permits operation. Additionally, in a twin-compressor system, the likelihood increases that at least one compressor happens to be within the acceptable range. This effectively masks the underlying flaw in the control logic (as is the case with many other things in domestic heating).
 
 So there you have it: It is largely by coincidence that your Alpha Innotec heat pump is working at all.
+
+**Solution**
+
+Adjust the compressor heater target temperature calculcation of the Luxtronik controller to a lower value.
+
+**Note**: This patch does **not** affect the actual temperature of the compressor heater. The LWD90 outdoor unit continues heating the compressor to the original target value. Rather, the Luxtronik controller now respects the temperature hysteresis.
 
 ### How to patch
 
