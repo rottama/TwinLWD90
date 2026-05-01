@@ -84,7 +84,7 @@ In V4.81.2, the idle compressor heating target is defined as:
 
 The Luxtronic controller firmware checks the compressor heater temperature sensor and allows compressor operation only if the measured temperature is **above** this target.
 
-However the compressor heater itself is not controlled by the Luxtronic controller, but by the firmware in the LWD90 outdoor unit. This firmware applies a negative hysteresis of -1°C: it switches off the compressor heater once when target temperature is reached and only reactivates it when the temperature drops to -1°C **below** the target.
+However the compressor heater itself is not controlled by the Luxtronic controller, but by the firmware in the LWD90 outdoor unit. This firmware applies a negative hysteresis of -1°C: it switches off the compressor heater once the target temperature is reached and only reactivates it when the temperature drops to -1°C **below** the target.
 
 In theory, this means the start condition could never be met.
 
