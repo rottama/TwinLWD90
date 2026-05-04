@@ -100,7 +100,12 @@ In most cases, the effects of this bug are less pronounced and typically appear 
 
 ![](img/VDHZ2.png "Effects of VDHZ bug")
 
-The key issue is that achieving maximum efficiency and cost-effectiveness when tuning heat pump parameters requires reliable and predictable control behavior.
+**Key issue 1:**
+Achieving maximum efficiency and cost-effectiveness when tuning heat pump parameters requires reliable and predictable control behavior.
+
+**Key issue 2:**
+The product documentation states that if insufficient flow is achieved during compressor startup, the attempt will fail silently, without any error message or shutdown indication.
+The Luxtronic controller exhibits similar behavior when compressor heating is insufficient. In this case, however, the behavior is completely undocumented.
 
 **Solution**
 
