@@ -84,13 +84,23 @@ In V4.81.2, the idle compressor heating target is defined as:
 
 The Luxtronic controller firmware checks the compressor heater temperature sensor and allows compressor operation only if the measured temperature is **above** this target.
 
-However the compressor heater itself is not controlled by the Luxtronic controller, but by the firmware in the LWD90 outdoor unit. This firmware applies a negative hysteresis of -1°C: it switches off the compressor heater once the target temperature is reached and only reactivates it when the temperature drops to -1°C **below** the target.
+However the compressor heater itself is not controlled by the Luxtronic controller, but by the firmware inside the LWD90 outdoor unit. This firmware applies a negative hysteresis of -1°C: it switches off the compressor heater once the target temperature is reached and only reactivates it when the temperature drops to -1°C **below** the target.
 
 In theory, this means the start condition could never be met.
 
 In practice, after the compressor heating phase ends, the measured temperature overshoots slightly due to thermal insulation around the compressor. This creates a brief window during which the Luxtronic controller considers the compressor ready and permits operation. Additionally, in a twin-compressor system, the likelihood increases that at least one compressor happens to be within the acceptable range. This effectively masks the underlying flaw in the control logic (as is the case with many other things in domestic heating).
 
-So there you have it: It is largely by coincidence that your Alpha Innotec heat pump is working at all.
+So there you have it: It is largely by coincidence that your Alpha Innotec twin heat pump is working at all.
+
+Here is a particulary annoying example of this behavior: the controller attempts to heat domestic hot water starting at 08:00, but the process is delayed until much later in the day, while the storage tank continues to deplete. After each attempt, the system then waits for 20 minutes (1 off-time switch cycle):
+
+![](img/VDHZ1.png "Effects of VDHZ bug")
+
+In most cases, the effects of this bug are less pronounced and typically appear only as brief delays (“single ticks”) before operation begins:
+
+![](img/VDHZ2.png "Effects of VDHZ bug")
+
+The key issue is that achieving maximum efficiency and cost-effectiveness when tuning heat pump parameters requires reliable and predictable control behavior.
 
 **Solution**
 
