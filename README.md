@@ -110,6 +110,15 @@ The Luxtronic controller exhibits similar behavior when compressor heating is in
 **Solution**
 
 Adjust the compressor heater target temperature calculcation of the Luxtronik controller to a lower value.
+Unfotunately, after applying this fix, the number of "ticks" or "tries" before the compressor starts up have not completely vanished. But they are much less (about ~50% reduction). This means something is still not right.
+
+But another interesting behavior has emerged. The current compressor statistics are:
+- CP1: 11'428 starts
+- CP2: 10'335 starts
+
+The Luxtronic controller normally attempts to balance compressor starts evenly between both units. Since applying this fix, however, **only CP2** is being engaged.
+
+I assume the controller is finally free to compensate for the approximately 700-start difference between the compressors, which likely accumulated as a result of the compressor heater bug.
 
 **Note**: This patch does **not** affect the actual temperature of the compressor heater. The LWD90 outdoor unit continues heating the compressor to the original target value. Rather, the Luxtronik controller now respects the temperature hysteresis.
 
