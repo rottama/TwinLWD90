@@ -22,8 +22,8 @@ Make note of the modification date of `appl_param1`. Param files are periodicall
 - SSH into the controller
 - Verify the compressor start counters at offsets 0x1516 and 0x151e:
 
-> \# hexdump -C -s $((0x1510)) -n 32 appl_param1
-> 00001510  00 00 01 00 00 00 a4 2c  00 00 01 00 00 00 64 28  |.......,......d(|
+> \# hexdump -C -s $((0x1510)) -n 32 appl_param1 <br>
+> 00001510  00 00 01 00 00 00 a4 2c  00 00 01 00 00 00 64 28  |.......,......d(| <br>
 > 00001520  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
 
 - Copy the file to your development machine:
@@ -58,11 +58,11 @@ Run CRC16 on `appl_param1_bare`:
 - SSH back into controller and modify file directly on the device (make a backup first):
 
 Apply modifications:
-> \# printf '\xa4\x2c' | dd of=appl_param1 bs=1 count=2 seek=$((0x151e)) conv=notrunc 
-> \# printf '\x??\x??' | dd of=appl_param1 bs=1 count=2 seek=0 conv=notrunc 
+> \# printf '\xa4\x2c' | dd of=appl_param1 bs=1 count=2 seek=$((0x151e)) conv=notrunc  <br>
+> \# printf '\x??\x??' | dd of=appl_param1 bs=1 count=2 seek=0 conv=notrunc <br>
 
 Re-verify:
-> \# hexdump -C -s $((0x1510)) -n 32 appl_param1
+> \# hexdump -C -s $((0x1510)) -n 32 appl_param1 <br>
 > \# hexdump -C -s 0 -n 32 appl_param1
 
 Power off the Luxtronik controller, wait 1 minute, then power it on again.
