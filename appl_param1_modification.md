@@ -22,9 +22,9 @@ Make note of the modification date of `appl_param1`. Param files are periodicall
 - SSH into the controller
 - Verify the compressor start counters at offsets 0x1516 and 0x151e:
 
-> \# hexdump -C -s $((0x1510)) -n 32 appl_param1 <br>
-> 00001510  00 00 01 00 00 00 a4 2c  00 00 01 00 00 00 64 28  |.......,......d(| <br>
-> 00001520  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+    \# hexdump -C -s $((0x1510)) -n 32 appl_param1
+    00001510  00 00 01 00 00 00 a4 2c  00 00 01 00 00 00 64 28  |.......,......d(|
+    00001520  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
 
 - Copy the file to your development machine:
 
