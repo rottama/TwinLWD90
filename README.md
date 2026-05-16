@@ -110,7 +110,7 @@ The Luxtronic controller exhibits similar behavior when compressor heating is in
 **Solution**
 
 Adjust the compressor heater target temperature calculcation of the Luxtronik controller to a lower value.
-Unfotunately, after applying this fix, the number of "ticks" or "tries" before the compressor starts up have not completely vanished. But they are much less (about ~50% reduction). This means something is still not right.
+The fix is working. The number of "ticks" or "tries" before the compressor starts have reduced by 80%. Unfotunately, some "false starts" remain. This means something is still not right.
 
 But another interesting behavior has emerged. The current compressor statistics are:
 - CP1: 11'428 starts
